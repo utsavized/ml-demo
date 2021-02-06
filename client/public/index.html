@@ -1,0 +1,68 @@
+<html>
+  <body>
+    <h1>VP DEMO</h1>
+    
+    <select id="model">
+      <option value="rmse">RMSE</option>
+      <option value="psnr">PSNR</option>
+      <option value="fsim">FSIM</option>
+      <option value="ssim">SSIM</option>
+      <option value="uiq">UIQ</option>
+      <option value="sam">SAM</option>
+      <option value="sre">SRE</option>
+    </select>
+
+    <div id="images"></div>
+
+
+    <script>
+        function renderImagaes(images) {
+          console.log("--------------------------------")  
+          var block = document.getElementById("images");
+            images.forEach(image => {
+                console.log(image)
+                var img = document.createElement("img");
+                img.setAttribute('src', 'static/images/' + image.key);
+                img.setAttribute('id', image.key);
+                img.setAttribute('onclick', "reorder(this);");
+
+                block.appendChild(img);
+            });
+        }
+
+        function reorder(elm) {
+          var image = elm.id;
+          var model = document.getElementById("model");
+          var param = "?image=" + image + "&model=" + model.value;
+
+          fetch('http://localhost:4000/api/reorder' + param, {
+                method: 'get'
+            })
+            .then(response => response.json())
+            .then(jsonData => {
+              var block = document.getElementById("images");
+              block.innerHTML = "";
+              renderImagaes(jsonData);
+            })
+            .catch(err => {
+                  console.log(err);
+              });
+
+        }
+
+        fetch('http://localhost:4000/api/fetchimages', {
+                method: 'get'
+            })
+        .then(response => response.json())
+        .then(jsonData => {
+            var block = document.getElementById("images");
+            renderImagaes(jsonData);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
+         
+    </script>
+  </body>
+</html>
